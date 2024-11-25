@@ -3,4 +3,4 @@ cv2
 numpy
 matplotlib
 ultralytics
-torch
+torch>=1.8
