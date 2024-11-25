@@ -1,6 +1,7 @@
 mediapipe
-cv2
+opencv-python
 numpy
 matplotlib
 ultralytics
 torch>=1.8
+roboflow
