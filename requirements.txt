@@ -2,3 +2,5 @@ mediapipe
 cv2
 numpy
 matplotlib
+ultralytics
+torch
