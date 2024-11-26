@@ -5,3 +5,4 @@ matplotlib
 ultralytics
 torch>=1.8
 roboflow
+python-dotenv
