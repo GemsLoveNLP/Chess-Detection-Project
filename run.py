@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import mediapipe as mp
 from collections import Counter
 import chess
+import chess.pgn
 
 import chessboard
 import detect
@@ -20,9 +21,12 @@ state_list = []
 pgn_list = []
 # noise frame tolerance
 TOLERANCE = 10
-# black class name
+# class names
 BLACK = "black"
 WHITE = "white"
+KING = "king"
+# promotion key for uci
+KEY = {"knight":"n","king":"k","bishop":"b","queen":"q","rook":"r","pawn":""}
 
 # wrap the video reader
 def frame_generator(video_path):
@@ -95,87 +99,119 @@ def summarize_states(lst, tolerance,verbose=False):
 
     return differences
 
-# TODO: Add any weird behavior apart from capturing
-def pgn_from_differences(differences):
-
-    KEY = {"knight":"N","king":"K","bishop":"B","queen":"Q","rook":"R","pawn":""}
-    # KEY_CAPTURE = {"knight":"N","king":"K","bishop":"B","queen":"Q","rook":"R","pawn":"P"}
+def uci_from_differences(differences):
 
     """
-    Convert the output of summarize_states into PGN format.
+    Convert the output of summarize_states into UCI format.
 
     Parameters:
         differences (list): List of differences as ({disappeared}, {appeared}).
 
     Returns:
-        list: A list of PGN strings describing the moves.
+        list: A list of UCI moves
     """
-    pgn_moves = []
+
+    uci_moves = []
 
     for disappeared, appeared in differences:
 
-        temp = []
+        l_d = len(disappeared)
+        l_a = len(appeared)
 
-        # Match disappeared and appeared pieces
-        for old_piece in disappeared:
-            # Try to find a matching appeared piece with the same (color, class)
-            match = next((new_piece for new_piece in appeared 
-                          if old_piece[:2] == new_piece[:2]), None)
-            if match:
-                # Movement: piece moved to a new position
-                old_pos = f"{old_piece[2]}{old_piece[3]}"
-                new_pos = f"{match[2]}{match[3]}"
-                # Add movement using the correct piece name
-                temp.append((KEY[old_piece[1]],old_pos,new_pos))
+        if l_d == 1 and l_a == 1: # movement or promotion
+
+            old = list(disappeared)[0]
+            new = list(appeared)[0]
+
+            if old[:2] == new[:2]: # if the class and color is the same -> movement
+                msg = f"{old[2]}{old[3]}{new[2]}{new[3]}"
+
+            else: # promotion
+                msg = f"{old[2]}{old[3]}{new[2]}{new[3]}{KEY[new[1]]}"
+
+        elif l_d == 2 and l_a == 1: # capturing
+
+            new = list(appeared)[0]
+            old = [piece for piece in disappeared if piece[:2] == new[:2]][0] # the capturer
+
+            msg = f"{old[2]}{old[3]}{new[2]}{new[3]}"
+
+        elif l_d == 2 and l_d == 2: # castling
+
+            new_king = [piece for piece in appeared if piece[:2] == KING][0]
+
+            if new_king[2] == "g": # king side
+                if new_king[0] == BLACK:
+                    msg = "e8g8"
+                else:
+                    msg = "e1g1"
+            elif new_king[2] == "c": # queen side
+                if new_king[0] == BLACK:
+                    msg = "e8c8"
+                else:
+                    msg = "e1c1"
             else:
-                # Piece disappeared without a matching appearance (elimination or capture)
-                old_pos = f"{old_piece[2]}{old_piece[3]}"
-                temp.append(f"{KEY[old_piece[1]]}{old_pos}x")
-        if len(temp) == 2:
-            if temp[0][0] != "":
-                pgn_moves.append(f"{temp[0][0]}x{temp[0][2]}")
-            else:
-                pgn_moves.append(f"{temp[0][1][0]}x{temp[0][2]}")
+                msg = "CASTLING_ERROR"
+
         else:
-            pgn_moves.append(f"{temp[0][0]}{temp[0][2]}")
 
-    # Group into pairs of black and white
-    def group_into_pairs(lst):
-        # Group consecutive elements in pairs, leave the last element if it's odd
-        return [lst[i] + " " + lst[i + 1] if i + 1 < len(lst) else lst[i] for i in range(0, len(lst), 2)]
+            msg = "MOVE_ERROR"
 
-    pgn = [f"{i+1}. {elm}" for i, elm in enumerate(group_into_pairs(pgn_moves))]
+        uci_moves.append(msg)
+     
+    return uci_moves
 
-    return pgn
+def generate_pgn(moves, ori):
 
-def visualization(ori, pgn):
+    """
+    Convert UCI moves on a board to PGN and also output board state 
 
+    Parameters:
+        moves (list) : List of UCI moves in the game
+        ori (list) : List of pieces on the board. Each piece is structured as (color, class, alphabet, num)
+
+    Returns:
+        pgn (str) : A string of PGN of the game
+        board_states (list) : a list of board states. Each state is a string
+    
+    """
+
+    # initialize board
     board = chess.Board()
-    board.clear()
-    for color, piece, alpha, num in ori:
-        
-        if color == BLACK:
-            piece = piece.lower()
-        elif color == WHITE:
-            piece = piece.upper()
 
-        position = alpha + num
-        square = chess.parse_square(position)
-        board.set_piece_at(square, chess.Piece.from_symbol(piece))
+    # if there is a predetermined starting point
+    if ori is not None:
+        board.clear()
 
-    state_list = list()
-    state_list.append(str(board))
+        # place each piece
+        for color, piece, alpha, num in ori:
+            if color == BLACK:
+                piece = piece.lower()
+            elif color == WHITE:
+                piece = piece.upper()
 
-    for line in pgn:
-        num, move1, move2 = pgn.split()
+            position = alpha + str(num)
+            square = chess.parse_square(position)
+            board.set_piece_at(square, chess.Piece.from_symbol(piece))
 
-        board.push_san(move1)
-        state_list.append(str(board))
+    # create game
+    game = chess.pgn.Game()
+    node = game
+    node.headers["FEN"] = board.fen()
 
-        board.push_san(move2)
-        state_list.append(str(board))
-
-    return state_list
+    # iterate through UCI and keep track of board state
+    board_states = list()
+    board_states.append(board)
+    for move in moves:
+        try:
+            node = node.add_variation(board.parse_uci(move))
+            board.push_uci(move)
+            board_states.append(board)
+        except ValueError:
+            print(f"Move {move} is invalid")
+    
+    pgn = str(game).split("\n")[-1]
+    return pgn, board_states
 
 # main
 def main(video_path):
@@ -211,8 +247,8 @@ def main(video_path):
         
     # Once the processing is finished
     differences = summarize_states(lst=state_list, tolerance=TOLERANCE)
-    pgn = pgn_from_differences(differences)
-    board_states = visualization(ori, pgn)
+    uci = uci_from_differences(differences)
+    pgn, board_states = generate_pgn(moves=uci, ori=ori)
 
     return pgn, board_states   
 

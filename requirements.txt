@@ -6,3 +6,4 @@ ultralytics
 torch>=1.8
 roboflow
 python-dotenv
+python-chess==1.11.1
