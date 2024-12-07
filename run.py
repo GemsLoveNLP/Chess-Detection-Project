@@ -26,7 +26,8 @@ BLACK = "black"
 WHITE = "white"
 KING = "king"
 # promotion key for uci
-KEY = {"knight":"n","king":"k","bishop":"b","queen":"q","rook":"r","pawn":""}
+PROMOTE_KEY = {"knight":"n","king":"k","bishop":"b","queen":"q","rook":"r","pawn":""}
+SYM_KEY = {"knight":"n","king":"k","bishop":"b","queen":"q","rook":"r","pawn":"p"}
 
 # wrap the video reader
 def frame_generator(video_path):
@@ -127,7 +128,7 @@ def uci_from_differences(differences):
                 msg = f"{old[2]}{old[3]}{new[2]}{new[3]}"
 
             else: # promotion
-                msg = f"{old[2]}{old[3]}{new[2]}{new[3]}{KEY[new[1]]}"
+                msg = f"{old[2]}{old[3]}{new[2]}{new[3]}{PROMOTE_KEY[new[1]]}"
 
         elif l_d == 2 and l_a == 1: # capturing
 
@@ -185,14 +186,17 @@ def generate_pgn(moves, ori):
 
         # place each piece
         for color, piece, alpha, num in ori:
+
+            sym = SYM_KEY[piece]
+
             if color == BLACK:
-                piece = piece.lower()
+                piece = sym.lower()
             elif color == WHITE:
-                piece = piece.upper()
+                piece = sym.upper()
 
             position = alpha + str(num)
             square = chess.parse_square(position)
-            board.set_piece_at(square, chess.Piece.from_symbol(piece))
+            board.set_piece_at(square, chess.Piece.from_symbol(sym))
 
     # create game
     game = chess.pgn.Game()
