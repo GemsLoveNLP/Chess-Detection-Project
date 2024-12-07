@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mediapipe as mp
 from collections import Counter
+import chess
 
 import chessboard
 import detect
@@ -19,6 +20,9 @@ state_list = []
 pgn_list = []
 # noise frame tolerance
 TOLERANCE = 10
+# black class name
+BLACK = "black"
+WHITE = "white"
 
 # wrap the video reader
 def frame_generator(video_path):
@@ -135,7 +139,7 @@ def pgn_from_differences(differences):
         else:
             pgn_moves.append(f"{temp[0][0]}{temp[0][2]}")
 
-    # Group into pairs
+    # Group into pairs of black and white
     def group_into_pairs(lst):
         # Group consecutive elements in pairs, leave the last element if it's odd
         return [lst[i] + " " + lst[i + 1] if i + 1 < len(lst) else lst[i] for i in range(0, len(lst), 2)]
@@ -144,7 +148,34 @@ def pgn_from_differences(differences):
 
     return pgn
 
+def visualization(ori, pgn):
 
+    board = chess.Board()
+    board.clear()
+    for color, piece, alpha, num in ori:
+        
+        if color == BLACK:
+            piece = piece.lower()
+        elif color == WHITE:
+            piece = piece.upper()
+
+        position = alpha + num
+        square = chess.parse_square(position)
+        board.set_piece_at(square, chess.Piece.from_symbol(piece))
+
+    state_list = list()
+    state_list.append(str(board))
+
+    for line in pgn:
+        num, move1, move2 = pgn.split()
+
+        board.push_san(move1)
+        state_list.append(str(board))
+
+        board.push_san(move2)
+        state_list.append(str(board))
+
+    return state_list
 
 # main
 def main(video_path):
@@ -169,20 +200,25 @@ def main(video_path):
             # reformat the piece_cg set to indicate row and column instead
             detection_cell = {(piece_class.split("-")[0], # color
                                piece_class.split("-")[0], # class
-                               X_INDEX[x//x_cell_size], # column
-                               Y_INDEX[y//y_cell_size]) # row
+                               X_INDEX[x//x_cell_size], # column: a,b,c..
+                               Y_INDEX[y//y_cell_size]) # row: 1,2,...
                                for piece_class,x,y in piece_cg}
             
             state_list.append(detection_cell)
+
+    # Original state
+    ori = state_list[0]
         
     # Once the processing is finished
     differences = summarize_states(lst=state_list, tolerance=TOLERANCE)
     pgn = pgn_from_differences(differences)
+    board_states = visualization(ori, pgn)
 
-    return pgn      
+    return pgn, board_states   
 
 
 if __name__ == "__main__":
     # Replace with your video file path
     video_path = "2_move_student.mp4"
-    main(video_path)
+    pgn, board_states = main(video_path)
+    print(pgn)
