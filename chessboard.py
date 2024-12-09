@@ -93,25 +93,53 @@ class ChessboardProcessor:
     # Generates random points within the image dimensions
     def generate_random_points(self, num_points=4):
         height, width, _ = self.image.shape
+        
+        # Generate random points
         random_points = [(random.randint(0, width - 1), random.randint(0, height - 1)) for _ in range(num_points)]
-        return np.float32(random_points)
-
+        random_points = np.float32(random_points)
+        
+        # Create a list of tuples with (piece, x_coord, y_coord)
+        piece_list = []
+        for i, (x_coord, y_coord) in enumerate(random_points, start=1):
+            piece_list.append((f"piece {i}", x_coord, y_coord))
+        
+        return piece_list
+    
     # Main function to process the image
     def rotate_and_warp(self, frame, detection_cg):
+        # Find the chessboard corners in the frame
         corners = self.find_board_corners()
         if corners is not None:
-
+            # Copy the original image for visualization
             image_with_points = self.image.copy()
-            self.draw_points(image_with_points, detection_cg)
 
+            # Draw the original detection CG points on the original image
+            for piece, x_coord, y_coord in detection_cg:
+                self.draw_points(image_with_points, [(x_coord, y_coord)])
+
+            # Warp the image based on the detected chessboard corners
             warped_image = self.warp_image(corners)
-            transformed_points = cv2.perspectiveTransform(np.array([random_points]), self.transformation_matrix)[0]
-            self.draw_points(warped_image, transformed_points)
 
+            # Prepare the original detection CG points for transformation
+            original_points = np.array([[x, y] for _, x, y in detection_cg], dtype=np.float32).reshape(-1, 1, 2)
+
+            # Apply perspective transformation to the original points
+            transformed_points = cv2.perspectiveTransform(original_points, self.transformation_matrix)
+
+            # Prepare the transformed points as a list of tuples (piece, x_new, y_new)
+            transformed_points_list = []
+            for i, (piece, _, _) in enumerate(detection_cg):  # Correct unpacking here
+                x_new, y_new = transformed_points[i][0]
+                transformed_points_list.append((piece, x_new, y_new))
+
+            # Draw the transformed points on the warped image
+            self.draw_points(warped_image, transformed_points[:, 0])
+
+            # Display the original image with points and the warped image with transformed points
             plt.figure(figsize=(12, 6))
             plt.subplot(1, 2, 1)
             plt.imshow(cv2.cvtColor(image_with_points, cv2.COLOR_BGR2RGB))
-            plt.title("Original Image with Random Points")
+            plt.title("Original Image with Detection Points")
             plt.axis('off')
 
             plt.subplot(1, 2, 2)
@@ -120,9 +148,13 @@ class ChessboardProcessor:
             plt.axis('off')
 
             plt.show()
+
+            return warped_image, transformed_points_list
         else:
             print("Could not find the corners of the chessboard.")
-        return warped_image, transformed_points
+            return None, None
+
+
 
 # Example usage
 path = 'chess_model/chess_data/train/images'  # Update with your image path
@@ -132,6 +164,7 @@ image = os.path.join(path, files[1])
 
 processor = ChessboardProcessor(image)
 random_points = processor.generate_random_points() #assume these are the bbox coordinates
-transformed_image,transformed_points = processor.rotate_and_warp(image, random_points)
+
+transformed_image,transformed_points = processor.rotate_and_warp(image, random_points) #REPLACE random points 
 
 print("Transformed Points in 640x640 Plane:", transformed_points)
