@@ -60,34 +60,36 @@ def hands_detected(frame):
     return results.multi_hand_landmarks is not None
 
 # summarize state list into easy to use format
-def summarize_states(lst, tolerance,verbose=False):
-    if verbose:
-        print("Original list of states:", lst)
-    
-    # Step 1: Count occurrences of each exact state
-    state_counts = Counter(frozenset(state) for state in lst)
-    if verbose:
-        print("State counts:", state_counts)
-    
-    # Determine major states (those appearing >= tolerance times)
-    major_states = {state for state, count in state_counts.items() if count >= tolerance}
-    if verbose:
-        print("Major states:", major_states)
-    
-    # Filter list to include only major states
-    filtered_lst = [state for state in lst if frozenset(state) in major_states]
-    if verbose:
-        print("Filtered list:", filtered_lst)
+def summarize_states(lst, tolerance):
 
-    # Step 2: Summarize consecutive phases
+    # Step 1: Clean the state list of noises
+    # initialize counters
+    state_counter = 1
+    previous = None
+    updated = False
     summarized_states = []
-    for state in filtered_lst:
-        if not summarized_states or summarized_states[-1] != state:
-            summarized_states.append(state)
-    if verbose:
-        print("Summarized states:", summarized_states)
+    # loop through the list
+    for state in lst:
 
-    # Step 3: Identify differences between consecutive states
+        # if new state detected
+        if previous is None or state != previous:
+            state_counter = 1
+            updated = False
+
+        # if the count of state reaches tolerance
+        if state_counter >= tolerance and not updated:
+            # print("Noted")
+            summarized_states.append(state)
+            updated = True
+
+        # print(f"state = {state}\nprevious = {previous}\nstate_counter={state_counter}\nupdated={updated}","\n")
+
+        # iterate the counters
+        state_counter += 1
+        previous = state
+    # print(f"Summarized:", summarized_states)
+
+    # Step 2: Identify differences between consecutive states
     differences = []
     for i in range(len(summarized_states) - 1):
         old_state = summarized_states[i]
@@ -97,8 +99,7 @@ def summarize_states(lst, tolerance,verbose=False):
         appeared = new_state - old_state
         
         differences.append((disappeared, appeared))
-    if verbose:
-        print("Differences:", differences)
+    # print("Differences:", differences)
 
     return differences
 
