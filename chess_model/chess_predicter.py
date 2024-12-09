@@ -4,8 +4,8 @@ class ChessPredicter:
     def __init__(self, model):
       self.model = model
 
-    def predict_image(self, img_path):
-      results = self.model(img_path)[0]
+    def predict_image(self, img):
+      results = self.model(img)[0]
       return results.to_json()
 
     def predict_video(self):
