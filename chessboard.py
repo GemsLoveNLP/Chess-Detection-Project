@@ -106,7 +106,7 @@ class ChessboardProcessor:
         return piece_list
     
     # Main function to process the image
-    def rotate_and_warp(self, frame, detection_cg):
+    def rotate_and_warp(self, detection_cg):
         # Find the chessboard corners in the frame
         corners = self.find_board_corners()
         if corners is not None:

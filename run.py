@@ -6,7 +6,7 @@ from collections import Counter
 import chess
 import chess.pgn
 
-import chessboard
+from chessboard import ChessboardProcessor
 import detect
 
 # initaiate hands
@@ -223,7 +223,7 @@ def generate_pgn(moves, ori):
 # main
 def main(video_path):
 
-    for index,frame in enumerate(frame_generator(video_path)):
+    for frame in frame_generator(video_path):
 
         h,w,_ = frame.shape
         delta = (h-w)//2
@@ -237,7 +237,10 @@ def main(video_path):
             detection_cg = {(piece_class,x+w//2,y+h) for piece_class,x,y,h,w in detection}
 
             # get the transformed image and the coordinate of the transformed CG
-            img, piece_cg = chessboard.rotate_and_warp(frame,detection_cg)
+            chessboard = ChessboardProcessor(frame)
+            img, piece_cg = chessboard.rotate_and_warp(detection_cg)
+            if img is None or piece_cg is None: # if the frame is bad skip it
+                continue
 
             # get the image size to divide into cells
             shape = img.shape
