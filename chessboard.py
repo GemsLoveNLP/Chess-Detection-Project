@@ -12,9 +12,9 @@ class ChessboardProcessor:
     WIDTH = 640
     HEIGHT = 640
 
-    def __init__(self, image_path):
-        self.image_path = image_path
-        self.image = cv2.imread(image_path)
+    def __init__(self, image):
+        # self.image_path = image_path
+        self.image = image
         self.warped_image = None
         self.transformation_matrix = None
 
@@ -156,15 +156,17 @@ class ChessboardProcessor:
 
 
 
-# Example usage
-path = 'chess_model/chess_data/train/images'  # Update with your image path
-files = os.listdir(path)
+if __name__ == "__main__":
+    # Example usage
+    path = 'chess_model/chess_data/train/images'  # Update with your image path
+    files = os.listdir(path)
 
-image = os.path.join(path, files[2])
+    image = os.path.join(path, files[2])
+    image = cv2.imread(image)
 
-processor = ChessboardProcessor(image)
-random_points = processor.generate_random_points() #assume these are the bbox coordinates
+    processor = ChessboardProcessor(image)
+    random_points = processor.generate_random_points() #assume these are the bbox coordinates
 
-transformed_image,transformed_points = processor.rotate_and_warp(image, random_points) #REPLACE random points 
+    transformed_image,transformed_points = processor.rotate_and_warp(image, random_points) #REPLACE random points 
 
-print("Transformed Points in 640x640 Plane:", transformed_points)
+    print("Transformed Points in 640x640 Plane:", transformed_points)
