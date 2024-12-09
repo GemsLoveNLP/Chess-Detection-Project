@@ -21,6 +21,8 @@ state_list = []
 pgn_list = []
 # noise frame tolerance
 TOLERANCE = 10
+# crop distance
+CROP = 50
 # class names
 BLACK = "black"
 WHITE = "white"
@@ -222,6 +224,10 @@ def main(video_path):
 
     for index,frame in enumerate(frame_generator(video_path)):
 
+        h,w,_ = frame.shape
+        delta = (h-w)//2
+        frame = frame[delta+CROP:delta+w-CROP,:,:]
+
         # if hand is there
         if not hands_detected(frame):
 
@@ -236,6 +242,8 @@ def main(video_path):
             shape = img.shape
             x_cell_size = shape[0]//8
             y_cell_size = shape[1]//8
+
+            # img, {(white-knight,x,y),(black-queen,x1,y1)}
 
             # reformat the piece_cg set to indicate row and column instead
             detection_cell = {(piece_class.split("-")[0], # color
