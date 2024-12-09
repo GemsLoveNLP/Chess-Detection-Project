@@ -1,3 +1,4 @@
+__pycache__/
 chess_model/chess_data/*
 !chess_model/chess_data/  # Exclude the folder but allow the folder structure
 .env
