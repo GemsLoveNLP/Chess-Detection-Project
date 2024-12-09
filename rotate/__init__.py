@@ -18,10 +18,19 @@ def detect_dark_square_position(image, save_path):
     
     # cv2.imwrite(save_path + "_0_crop.jpg", cropped_image)
     
-    margin_top = int(height * 0.1)
-    margin_bottom = -int(height * 0.1)
-    margin_left = int(width * 0.1)
-    margin_right = -int(width * 0.1)
+    margin_top = height // 10
+    margin_bottom = -height // 10
+    margin_left = width // 10
+    margin_right = -width // 10
+    
+    # cv2.imshow("", cropped_image[0:margin_top, 0:margin_left])
+    # cv2.waitKey(0)
+    # cv2.imshow("", cropped_image[0:margin_top, margin_right:])
+    # cv2.waitKey(0)
+    # cv2.imshow("", cropped_image[margin_bottom:, 0:margin_left])
+    # cv2.waitKey(0)
+    # cv2.imshow("", cropped_image[margin_bottom:, margin_right:])
+    # cv2.waitKey(0)
     
     quarters = {
         "top-left":     cropped_image[0:margin_top, 0:margin_left],
@@ -48,7 +57,7 @@ def detect_dark_square_position(image, save_path):
 def check_bottom_left_with_ocr(image):
     # Crop the bottom-left quarter of the image
     # Assuming rotated_image is a cv2 image (NumPy array)
-    height, width = image.shape[:2]
+    height, width, _ = image.shape
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -60,13 +69,10 @@ def check_bottom_left_with_ocr(image):
     # Resize the cropped region (increasing its size by a factor of 2)
     enlarge = cv2.resize(crop, (width * 2, height * 2), interpolation=cv2.INTER_CUBIC)
 
-    # kernel = np.array([[-1, -1, -1],
-    #                           [-1,  9, -1],
-    #                           [-1, -1, -1]])
-    # sharp = cv2.filter2D(enlarge, -1, kernel)
-
-    # _, th = cv2.threshold(enlarge, 170, 255, cv2.THRESH_TOZERO)
     _, th = cv2.threshold(enlarge, 165, 255, cv2.THRESH_BINARY)
+    
+    cv2.imshow("", th)
+    cv2.waitKey(0)
 
 
     # Perform OCR on the cropped region
@@ -115,16 +121,16 @@ def rotate_chessboard(image_path, save_path):
 
     cv2.imwrite(save_path + "_1_corner.jpg", rotated_image)
 
-    # # Verify bottom-left corner with OCR
-    # if check_bottom_left_with_ocr(rotated_image):
-    #     rotated_image_2 = rotated_image
-    # else:
-    #     # Rotate 180 degrees more if needed
-    #     rotated_image_2 = cv2.rotate(rotated_image, cv2.ROTATE_180)
-    #     print("Rotate 180 degrees")
+    # Verify bottom-left corner with OCR
+    if check_bottom_left_with_ocr(rotated_image):
+        rotated_image_2 = rotated_image
+    else:
+        # Rotate 180 degrees more if needed
+        rotated_image_2 = cv2.rotate(rotated_image, cv2.ROTATE_180)
+        print("Rotate 180 degrees")
 
-    # cv2.imwrite(save_path, rotated_image_2)
-    # print(f"Final image saved at: {save_path}")
+    cv2.imwrite(save_path+ "_2_swap.jpg", rotated_image_2)
+    print(f"Final image saved at: {save_path}")
 
 
 # Example usage
