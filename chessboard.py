@@ -128,7 +128,7 @@ class ChessboardProcessor:
 path = 'chess_model/chess_data/train/images'  # Update with your image path
 files = os.listdir(path)
 
-image = os.path.join(path, files[1])
+image = os.path.join(path, files[2])
 
 processor = ChessboardProcessor(image)
 random_points = processor.generate_random_points() #assume these are the bbox coordinates
