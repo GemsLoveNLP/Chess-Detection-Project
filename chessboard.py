@@ -232,7 +232,7 @@ def main():
         processor = ChessboardProcessor(frame)
         detection_cg = processor.generate_random_points()
 
-        transformed_image, transformed_points = processor.rotate_and_warp(frame, detection_cg)
+        transformed_image, transformed_points = processor.rotate_and_warp(detection_cg)
 
         # Resize frames to display them smaller
         resized_frame = cv2.resize(frame, (640, 640))
