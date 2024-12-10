@@ -47,8 +47,6 @@ def preprocess_and_detect_lines(img):
 
     # Find contours in the dilated image
     contours, _ = cv2.findContours(black_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Loop through the contours and check for square-like contours
 
     max_board = np.zeros_like(img_dilation)
     board_copy = img.copy()  # Use original image as base for drawing contours
