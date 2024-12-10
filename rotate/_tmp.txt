@@ -1,4 +1,0 @@
-Install tesseract
-sudo apt-get install tesseract-ocr
-
-gotta check all 4 corner since if check only half, if white is on green and another is marked, marked will be detected as green
