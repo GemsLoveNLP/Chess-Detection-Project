@@ -14,10 +14,13 @@ height, width = enlarge.shape
 norm = cv2.normalize(enlarge, np.zeros((height, width)), 0, 255, cv2.NORM_MINMAX)
 # blurred = cv2.GaussianBlur(norm, (5, 5), 0)
 
-_, th = cv2.threshold(norm, 165, 255, cv2.THRESH_BINARY)
-crop = th[height // 2:, 0:width // 2]
-crop_left = th[height // 2:, 0:width // 5]
-crop_bot = th[-height // 5:, 0:width // 2]
+_, th = cv2.threshold(norm, 165, 255, cv2.THRESH_BINARY_INV)
+kernel = np.ones((2, 2), np.uint8)
+dilated_image = cv2.dilate(th, kernel, iterations=2)  # You can adjust the number of iterations
+
+crop = dilated_image[height // 2:, 0:width // 2]
+crop_left = dilated_image[height // 2:, 0:width // 5]
+crop_bot = dilated_image[-height // 5:, 0:width // 2]
 
 custom_config = r'--oem 3 --psm 6'
 
