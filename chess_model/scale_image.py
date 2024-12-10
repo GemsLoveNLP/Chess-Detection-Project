@@ -2,9 +2,9 @@ from PIL import Image, ImageOps
 import os
 
 # Input directory containing the .png images
-input_directory = "E:/split_data/val/images"
+input_directory = "E:/split_data/train/images"
 # Output directory to save the .jpg images
-output_directory = "C:/Desktop/Chess-Detection-Project/chess_model/chess_data/val/images/"
+output_directory = "C:/Desktop/Chess-Detection-Project/chess_model/chess_data/train/images/"
 
 # Ensure the output directory exists
 os.makedirs(output_directory, exist_ok=True)
@@ -21,11 +21,10 @@ for filename in os.listdir(input_directory):
         with Image.open(input_path) as img:
             # Resize the image to the target size
             resized_img = img.resize(target_size, Image.BILINEAR)
-            rotated_image = resized_img.rotate(90, expand=True)
 
             # Convert and save as .jpg
             output_path = os.path.join(output_directory, f"{os.path.splitext(filename)[0]}.jpg")
-            rotated_image.convert("RGB").save(output_path, "JPEG")
+            resized_img.convert("RGB").save(output_path, "JPEG")
         
         print(f"Processed and saved: {output_path}")
 
