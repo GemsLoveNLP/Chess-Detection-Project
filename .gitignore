@@ -4,3 +4,4 @@ chess_model/chess_data/*
 .env
 chess_model/runs/predict/*
 !chess_model/runs/predict/
+experiments/
