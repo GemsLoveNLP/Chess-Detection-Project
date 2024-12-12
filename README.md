@@ -18,12 +18,8 @@ https://github.com/user-attachments/assets/b3fb0e56-b470-4470-adf6-d08f8380c8ea
 
 ### Chess Video to PGN 
 Users can provide a chess video following the guidelines in AI_boys.ipynb to obtain the PGN file for recording chess games.
-| row_id | output  |
-|:-----|:--------:|------:|
-| 2_Move_rotate_student.mp4 | 1. Ng6 fxg3 * |
-| 6_Move_student.mp4 | 1. Qe4= Be1=Q 2. Qe8=B c4 * |
 
-| Left |  Center  |
+| row_id |  output  |
 |:-----|:-----|
 | 2_Move_rotate_student.mp4   | 1. Ng6 fxg3 * |
 | 6_Move_student.mp4   |  1. Qe4= Be1=Q 2. Qe8=B c4 *  |
