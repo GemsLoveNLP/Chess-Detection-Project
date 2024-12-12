@@ -15,7 +15,7 @@ Link to competition on Kaggle : [Chess Detection Competition](https://www.kaggle
 Users can provide a chess video or image following the guidelines in ./chess_model/evaluation.ipynb to obtain labeled chess pieces.
 
 ![image](https://github.com/user-attachments/assets/8520cc6e-d4c4-424b-b097-9ad551833420)
-<img src="[image-url](https://github.com/user-attachments/assets/8520cc6e-d4c4-424b-b097-9ad551833420)" alt="test code" width="300" height="200">
+<img src="https://github.com/user-attachments/assets/8520cc6e-d4c4-424b-b097-9ad551833420" alt="test code" width="300" height="200">
 
 https://github.com/user-attachments/assets/b3fb0e56-b470-4470-adf6-d08f8380c8ea
 
