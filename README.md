@@ -14,7 +14,7 @@ Link to competition on Kaggle : [Chess Detection Competition](https://www.kaggle
 ### Chess Piece Recognition
 Users can provide a chess video or image following the guidelines in ./chess_model/evaluation.ipynb to obtain labeled chess pieces.
 
-https://github.com/user-attachments/assets/1e722537-152a-4dad-bf01-c932e259486d
+https://github.com/user-attachments/assets/b3fb0e56-b470-4470-adf6-d08f8380c8ea
 
 ### Chess Video to PGN 
 Users can provide a chess video following the guidelines in AI_boys.ipynb to obtain the PGN file for recording chess games.
