@@ -23,11 +23,11 @@ Users can provide a chess video following the guidelines in AI_boys.ipynb to obt
 | 2_Move_rotate_student.mp4 | 1. Ng6 fxg3 * |
 | 6_Move_student.mp4 | 1. Qe4= Be1=Q 2. Qe8=B c4 * |
 
-| Left |  Center  | Right |
-|:-----|:--------:|------:|
-| L0   | **bold** | $1600 |
-| L1   |  `code`  |   $12 |
-| L2   | _italic_ |    $1 |
+| Left |  Center  |
+|:-----|:--------:|
+| L0   | **bold** |
+| L1   |  `code`  |
+| L2   | _italic_ |
 
 ## Project Pipeline
 
