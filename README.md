@@ -10,7 +10,12 @@ Link to competition on Kaggle : [Chess Detection Competition](https://www.kaggle
 - The algorithm can detect chess on video.
 - Visualize its. (Optional) 
 
-## Pipeline
+# Model Prediction
+### Chess Piece Recognition
+
+### Chess Video to PGN 
+
+## Project Pipeline
 
 ### Preprocessing
 - Extract frames from video
