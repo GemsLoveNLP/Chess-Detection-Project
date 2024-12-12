@@ -14,6 +14,8 @@ Link to competition on Kaggle : [Chess Detection Competition](https://www.kaggle
 ### Chess Piece Recognition
 Users can provide a chess video or image following the guidelines in ./chess_model/evaluation.ipynb to obtain labeled chess pieces.
 
+![image](https://github.com/user-attachments/assets/8520cc6e-d4c4-424b-b097-9ad551833420)
+
 https://github.com/user-attachments/assets/b3fb0e56-b470-4470-adf6-d08f8380c8ea
 
 ### Chess Video to PGN 
@@ -23,7 +25,7 @@ Users can provide a chess video following the guidelines in AI_boys.ipynb to obt
 |:-----|:-----|
 | 2_Move_rotate_student.mp4   | 1. Ng6 fxg3 * |
 | 6_Move_student.mp4   |  1. Qe4= Be1=Q 2. Qe8=B c4 *  |
-| L2   | _italic_ |
+| 8_Move_student.mp4   | 1. Qe1=K b4= 2. Qe1=K Qe1=K 3. Rxc8 c6=B 4. Be... |
 
 ## Project Pipeline
 
